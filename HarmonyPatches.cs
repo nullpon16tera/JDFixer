@@ -153,23 +153,13 @@ namespace JDFixer
     }
 
 
-    [HarmonyPatch(typeof(MissionSelectionMapViewController), "SongPlayerCrossfadeToLevelAsync")]
-    internal class MissionSelectionPatch
-    {
-        internal static BeatmapLevel cc_level = null;
-        internal static void Postfix(BeatmapLevel level)
-        {
-            cc_level = level;
-        }
-    }
-
-
     [HarmonyPatch]
     internal class StandardLevelScenesTransitionSetupDataSOPatch
     {
         private static MethodBase TargetMethod() => AccessTools.FirstMethod(typeof(StandardLevelScenesTransitionSetupDataSO),
             m => m.Name == nameof(StandardLevelScenesTransitionSetupDataSO.Init) &&
-                 m.GetParameters().All(p => p.ParameterType != typeof(IBeatmapLevelData)));
+                 m.DeclaringType == typeof(StandardLevelScenesTransitionSetupDataSO) &&
+                 m.GetParameters().Any(p => p.ParameterType == typeof(GameplayModifiers)));
 
         internal static void Postfix(GameplayModifiers gameplayModifiers, PracticeSettings practiceSettings)
         {
